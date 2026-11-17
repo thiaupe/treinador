@@ -49,6 +49,13 @@
   .empty { color: var(--muted); }
   .status { font-size: 14px; color: var(--muted); margin-top: 10px; }
   .status.ok { color: var(--ok); }
+  .analise .an-t { font-weight: 700; font-size: 18px; }
+  .analise .an-d { color: var(--muted); font-size: 12px; margin: 2px 0 10px; }
+  .analise .an-x { white-space: pre-line; }
+  details { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
+  details summary { color: var(--muted); font-size: 14px; cursor: pointer; }
+  details .old { padding: 10px 0; border-top: 1px solid var(--line); }
+  details .old:first-of-type { border-top: 0; }
   .hidden { display: none; }
   footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 8px; }
   footer a { color: var(--muted); }
@@ -97,6 +104,14 @@
     <h2 id="treino-h">Próximo treino</h2>
     <div class="treino-nome" id="treino-nome"></div>
     <div class="treino-det" id="treino-det"></div>
+  </section>
+
+  <section class="card analise hidden" id="c-analise">
+    <h2 id="an-h">Análise do treinador</h2>
+    <div class="an-t" id="an-t"></div>
+    <div class="an-d" id="an-d"></div>
+    <div class="an-x" id="an-x"></div>
+    <details id="an-old" class="hidden"><summary>Análises anteriores</summary><div id="an-lista"></div></details>
   </section>
 
   <section class="card">
@@ -165,7 +180,29 @@ function fmt(ts) {
 }
 
 async function render() {
-  const ms = (await mensagens()).sort((a, b) => (a.ts < b.ts ? 1 : -1));
+  const todas = (await mensagens()).sort((a, b) => (a.ts < b.ts ? 1 : -1));
+  const ehAnalise = (m) => m.kind === 'analise' || m.kind === 'resumo';
+  const ans = todas.filter(ehAnalise);
+  const ms = todas.filter((m) => !ehAnalise(m));
+  if (ans.length) {
+    const a = ans[0];
+    $('c-analise').classList.remove('hidden');
+    $('an-h').textContent = a.kind === 'resumo' ? 'Resumo da semana' : 'Análise do dia';
+    $('an-t').textContent = a.title;
+    $('an-d').textContent = fmt(a.ts);
+    $('an-x').textContent = a.texto || a.body;
+    if (ans.length > 1) {
+      $('an-old').classList.remove('hidden');
+      $('an-lista').innerHTML = '';
+      ans.slice(1, 30).forEach((o) => {
+        const el = document.createElement('div'); el.className = 'old';
+        const t = document.createElement('div'); t.className = 'an-t'; t.style.fontSize = '16px'; t.textContent = o.title;
+        const d = document.createElement('div'); d.className = 'an-d'; d.textContent = fmt(o.ts);
+        const x = document.createElement('div'); x.className = 'an-x'; x.textContent = o.texto || o.body;
+        el.append(t, d, x); $('an-lista').appendChild(el);
+      });
+    }
+  }
   if (ms.length) {
     $('lista').innerHTML = '';
     ms.slice(0, 40).forEach((m) => {
