@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Treinador</title>
+<meta name="theme-color" content="#111214">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Treinador">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+  :root {
+    --bg: #111214; --card: #1b1d21; --line: #2a2d33; --text: #f3f1ee; --muted: #9a9ea6;
+    --accent: #ff5a1f; --accent-soft: rgba(255,90,31,.14); --ok: #3ccf7a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+  main { max-width: 560px; margin: 0 auto;
+    padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 32px); }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  header img { width: 44px; height: 44px; border-radius: 11px; }
+  header h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  .count { background: linear-gradient(135deg, #ff5a1f, #d9441a); border-radius: 18px; padding: 18px 20px; margin-bottom: 16px; }
+  .count .n { font-size: 52px; font-weight: 800; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .count .l { font-size: 15px; opacity: .92; margin-top: 4px; }
+  .count .g { font-size: 13px; opacity: .85; margin-top: 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+  .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+  .treino-nome { font-size: 20px; font-weight: 700; }
+  .treino-det { color: var(--muted); margin-top: 4px; white-space: pre-line; }
+  button { appearance: none; border: 0; border-radius: 12px; padding: 14px 16px; width: 100%;
+    font: 600 16px/1 inherit; font-family: inherit; background: var(--accent); color: #fff; cursor: pointer; }
+  button.sec { background: transparent; border: 1px solid var(--line); color: var(--text); }
+  button:active { opacity: .8; }
+  ol.steps { margin: 8px 0 0; padding-left: 20px; } ol.steps li { margin: 6px 0; }
+  textarea { width: 100%; min-height: 110px; background: #0c0d0f; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; margin: 10px 0; resize: none; }
+  .msg { padding: 12px 0; border-top: 1px solid var(--line); }
+  .msg:first-of-type { border-top: 0; padding-top: 4px; }
+  .msg .t { font-weight: 650; }
+  .msg .b { margin-top: 2px; white-space: pre-line; }
+  .msg .d { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .empty { color: var(--muted); }
+  .status { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  .status.ok { color: var(--ok); }
+  .hidden { display: none; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 8px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icons/icon-192.png" alt="">
+    <div><h1>Treinador</h1><p>Maratona do Rio · 30/05/2027</p></div>
+  </header>
+
+  <section class="count">
+    <div class="n" id="dias">–</div>
+    <div class="l" id="dias-l">dias para a largada</div>
+    <div class="g">Meta 4h00 · Supermeta 3h30</div>
+  </section>
+
+  <section class="card hidden" id="c-install">
+    <h2>Instale o app</h2>
+    <div>Para receber as mensagens, o app precisa estar na tela de início:</div>
+    <ol class="steps">
+      <li>Abra este link no <b>Safari</b>.</li>
+      <li>Toque em <b>Compartilhar</b> (o quadrado com a seta).</li>
+      <li>Toque em <b>Adicionar à Tela de Início</b> e depois em <b>Adicionar</b>.</li>
+      <li>Abra o <b>Treinador</b> pelo ícone novo.</li>
+    </ol>
+  </section>
+
+  <section class="card hidden" id="c-ativar">
+    <h2>Notificações</h2>
+    <div id="ativar-txt">Ative para o treinador te mandar a véspera, o empurrão da manhã e a cobrança.</div>
+    <div style="margin-top:12px"><button id="b-ativar">Ativar notificações</button></div>
+    <div class="status" id="ativar-status"></div>
+  </section>
+
+  <section class="card hidden" id="c-codigo">
+    <h2>Código de ativação</h2>
+    <div>Copie e cole este código na conversa com o treinador. É só uma vez.</div>
+    <textarea id="codigo" readonly></textarea>
+    <button id="b-copiar">Copiar código</button>
+    <div class="status" id="copiar-status"></div>
+  </section>
+
+  <section class="card hidden" id="c-treino">
+    <h2 id="treino-h">Próximo treino</h2>
+    <div class="treino-nome" id="treino-nome"></div>
+    <div class="treino-det" id="treino-det"></div>
+  </section>
+
+  <section class="card">
+    <h2>Mensagens do treinador</h2>
+    <div id="lista"><div class="empty">Nenhuma mensagem ainda. A primeira chega na véspera do próximo treino.</div></div>
+  </section>
+
+  <section id="c-cfg" class="hidden" style="margin-bottom:16px">
+    <button class="sec" id="b-mostrar">Mostrar código de ativação</button>
+  </section>
+
+  <footer>Sem treino perdido. <span id="ver"></span></footer>
+</main>
+
+<script>
+const VAPID_PUBLIC = 'BOmT2E6gz2XK19yfBcZ-t4B7MOHwW_cuNtcPiwVC-Gqn1_mzTLUh2-yPbO3nnl2kkfyrqv8ZThONT17slZ6k6Wc';
+const PROVA = new Date('2027-05-30T07:00:00-03:00');
+const $ = (id) => document.getElementById(id);
+
+function contagem() {
+  const hoje = new Date();
+  const d = Math.ceil((PROVA - hoje) / 86400000);
+  $('dias').textContent = d > 0 ? d : '🏁';
+  $('dias-l').textContent = d === 1 ? 'dia para a largada' : d > 0 ? 'dias para a largada' : 'É dia de prova!';
+}
+
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function b64urlToUint8(s) {
+  const pad = '='.repeat((4 - (s.length % 4)) % 4);
+  const raw = atob((s + pad).replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
+}
+
+function codigoDe(sub) {
+  const json = JSON.stringify(sub.toJSON ? sub.toJSON() : sub);
+  return 'TREINADOR:' + btoa(unescape(encodeURIComponent(json)));
+}
+
+function db() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('treinador', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('msgs', { keyPath: 'id' });
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+
+async function mensagens() {
+  try {
+    const d = await db();
+    return await new Promise((res) => {
+      const req = d.transaction('msgs').objectStore('msgs').getAll();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = () => res([]);
+    });
+  } catch (_) { return []; }
+}
+
+function fmt(ts) {
+  try {
+    return new Date(ts).toLocaleString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  } catch (_) { return ''; }
+}
+
+async function render() {
+  const ms = (await mensagens()).sort((a, b) => (a.ts < b.ts ? 1 : -1));
+  if (ms.length) {
+    $('lista').innerHTML = '';
+    ms.slice(0, 40).forEach((m) => {
+      const el = document.createElement('div');
+      el.className = 'msg';
+      const t = document.createElement('div'); t.className = 't'; t.textContent = m.title;
+      const b = document.createElement('div'); b.className = 'b'; b.textContent = m.body;
+      const d = document.createElement('div'); d.className = 'd'; d.textContent = fmt(m.ts);
+      el.append(t, b, d);
+      $('lista').appendChild(el);
+    });
+  }
+  const comTreino = ms.find((m) => m.treino && m.treino.nome);
+  if (comTreino) {
+    const t = comTreino.treino;
+    $('c-treino').classList.remove('hidden');
+    $('treino-h').textContent = t.quando ? 'Treino · ' + t.quando : 'Próximo treino';
+    $('treino-nome').textContent = t.nome;
+    $('treino-det').textContent = t.detalhe || '';
+  }
+}
+
+async function swReg() {
+  if (!('serviceWorker' in navigator)) return null;
+  return navigator.serviceWorker.register('sw.js');
+}
+
+async function estado() {
+  const suportaPush = 'PushManager' in window && 'Notification' in window;
+  if (!isStandalone() && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    $('c-install').classList.remove('hidden');
+    return;
+  }
+  if (!suportaPush) {
+    $('c-ativar').classList.remove('hidden');
+    $('ativar-txt').textContent = 'Este navegador não recebe notificações. No iPhone, precisa do iOS 16.4 ou mais novo e do app aberto pela tela de início.';
+    $('b-ativar').classList.add('hidden');
+    return;
+  }
+  const reg = await navigator.serviceWorker.ready;
+  const sub = await reg.pushManager.getSubscription();
+  if (sub && Notification.permission === 'granted') {
+    $('c-cfg').classList.remove('hidden');
+    $('codigo').value = codigoDe(sub);
+  } else {
+    $('c-ativar').classList.remove('hidden');
+  }
+}
+
+$('b-ativar').addEventListener('click', async () => {
+  $('ativar-status').textContent = 'Ativando…';
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      $('ativar-status').textContent = 'Permissão negada. Em Ajustes › Notificações › Treinador, ative e tente de novo.';
+      return;
+    }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64urlToUint8(VAPID_PUBLIC) });
+    $('codigo').value = codigoDe(sub);
+    $('c-ativar').classList.add('hidden');
+    $('c-codigo').classList.remove('hidden');
+    $('c-cfg').classList.remove('hidden');
+  } catch (err) {
+    $('ativar-status').textContent = 'Não deu certo: ' + (err && err.message ? err.message : err);
+  }
+});
+
+$('b-copiar').addEventListener('click', async () => {
+  const v = $('codigo').value;
+  try { await navigator.clipboard.writeText(v); }
+  catch (_) { $('codigo').select(); document.execCommand('copy'); }
+  $('copiar-status').textContent = 'Copiado. Agora cole na conversa com o treinador.';
+  $('copiar-status').classList.add('ok');
+});
+
+$('b-mostrar').addEventListener('click', () => {
+  $('c-codigo').classList.toggle('hidden');
+});
+
+navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'nova-mensagem') render();
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { contagem(); render(); } });
+
+contagem();
+swReg().then(() => estado()).catch(() => {});
+render();
+</script>
+</body>
+</html>
