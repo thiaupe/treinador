@@ -1,5 +1,5 @@
 // Service worker do app Treinador: recebe as mensagens e guarda o histórico.
-const CACHE = 'treinador-v4';
+const CACHE = 'treinador-v5';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
@@ -18,7 +18,7 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   // rede primeiro, cache se estiver offline
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' })
       .then((r) => {
         const copy = r.clone();
         caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
