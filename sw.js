@@ -1,5 +1,5 @@
 // Service worker do app Treinador: recebe as mensagens e guarda o histórico.
-const CACHE = 'treinador-v3';
+const CACHE = 'treinador-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
@@ -52,16 +52,14 @@ async function save(msg) {
 self.addEventListener('push', (e) => {
   let data = {};
   try { data = e.data ? e.data.json() : {}; } catch (_) { data = { body: e.data ? e.data.text() : '' }; }
-  const msg = {
+  // guarda todos os campos (treino, texto, lesoes, semana e o que vier depois)
+  const msg = Object.assign({}, data, {
     id: data.id || String(Date.now()),
     ts: data.ts || new Date().toISOString(),
     title: data.title || 'Treinador',
     body: data.body || '',
     kind: data.kind || 'msg',
-    treino: data.treino || null,
-    texto: data.texto || null,
-    lesoes: data.lesoes || null,
-  };
+  });
   e.waitUntil((async () => {
     await save(msg);
     const cs = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });

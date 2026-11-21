@@ -56,6 +56,21 @@
   details summary { color: var(--muted); font-size: 14px; cursor: pointer; }
   .old { padding: 12px 0; border-top: 1px solid var(--line); }
   .old:first-child { border-top: 0; }
+  .sem { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px; padding: 2px 16px 6px; scrollbar-width: none; }
+  .sem::-webkit-scrollbar { display: none; }
+  .dia { flex: 0 0 112px; scroll-snap-align: start; background: #15171a; border: 1px solid var(--line); border-radius: 14px; padding: 10px 10px 12px; }
+  .dia.hoje { border-color: var(--accent); background: var(--accent-soft); }
+  .dia.passou { opacity: .55; }
+  .dia .dn { font-weight: 700; font-size: 15px; }
+  .dia .dd { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  .dia .it { display: flex; gap: 6px; align-items: flex-start; font-size: 13px; line-height: 1.3; margin-top: 6px; }
+  .dia .it i { flex: 0 0 8px; height: 8px; border-radius: 50%; margin-top: 4px; background: var(--muted); }
+  .dia .it.corrida i { background: var(--accent); } .dia .it.forca i { background: #5aa9ff; }
+  .dia .it.pilates i { background: #b98cff; } .dia .it.futevolei i { background: #f2b33d; }
+  .dia .it.descanso i { background: #3ccf7a; } .dia .it.viagem i, .dia .it.onibus i { background: #8a8f98; }
+  .dia .it.ok span::after { content: ' ✓'; color: var(--ok); font-weight: 700; }
+  .leg { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--muted); font-size: 12px; margin-top: 10px; }
+  .leg span { display: inline-flex; align-items: center; gap: 5px; } .leg i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
   .hidden { display: none !important; }
   .sub { color: var(--muted); font-size: 14px; margin: -2px 0 12px; }
   ul.rot { list-style: none; margin: 0; padding: 0; }
@@ -132,6 +147,12 @@
       <h2 id="treino-h">Próximo treino</h2>
       <div class="treino-nome" id="treino-nome"></div>
       <div class="treino-det" id="treino-det"></div>
+    </section>
+
+    <section class="card hidden" id="c-semana">
+      <h2 id="sem-h">Próximos dias</h2>
+      <div class="sem" id="sem"></div>
+      <div class="leg"><span><i style="background:var(--accent)"></i>Corrida</span><span><i style="background:#5aa9ff"></i>Força</span><span><i style="background:#b98cff"></i>Pilates</span><span><i style="background:#f2b33d"></i>Futevôlei</span><span><i style="background:#3ccf7a"></i>Descanso</span><span><i style="background:#8a8f98"></i>Viagem</span></div>
     </section>
 
     <section class="card">
@@ -374,9 +395,10 @@ async function render() {
   const todas = (await mensagens()).sort((a, b) => (a.ts < b.ts ? 1 : -1));
   const ehAnalise = (m) => m.kind === 'analise' || m.kind === 'resumo';
   const ehCorpo = (m) => m.kind === 'corpo';
+  const ehSemana = (m) => m.kind === 'semana';
   const ans = todas.filter(ehAnalise);
   const corpo = todas.filter(ehCorpo);
-  const ms = todas.filter((m) => !ehAnalise(m) && !ehCorpo(m));
+  const ms = todas.filter((m) => !ehAnalise(m) && !ehCorpo(m) && !ehSemana(m));
 
   // Hoje
   const hoje = new Date().toLocaleDateString('pt-BR');
@@ -395,6 +417,33 @@ async function render() {
     $('treino-h').textContent = t.quando ? 'Treino · ' + t.quando : 'Próximo treino';
     $('treino-nome').textContent = t.nome;
     $('treino-det').textContent = t.detalhe || '';
+  }
+
+  // Semana
+  const comSemana = todas.find((m) => Array.isArray(m.semana) && m.semana.length);
+  if (comSemana) {
+    const hojeISO = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const nomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    let dias = comSemana.semana.filter((d) => d.d >= hojeISO);
+    if (!dias.length) dias = comSemana.semana;
+    $('c-semana').classList.remove('hidden');
+    let alvo = null;
+    $('sem').replaceChildren(...dias.map((d) => {
+      const dt = new Date(d.d + 'T12:00:00');
+      const el = document.createElement('div');
+      el.className = 'dia' + (d.d === hojeISO ? ' hoje' : d.d < hojeISO ? ' passou' : '');
+      if (d.d === hojeISO) alvo = el;
+      const n = document.createElement('div'); n.className = 'dn'; n.textContent = d.d === hojeISO ? 'Hoje' : nomes[dt.getDay()];
+      const dd = document.createElement('div'); dd.className = 'dd'; dd.textContent = dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + (d.d === hojeISO ? ' · ' + nomes[dt.getDay()] : '');
+      el.append(n, dd);
+      (d.itens || []).forEach((it) => {
+        const r = document.createElement('div'); r.className = 'it ' + (it.t || '') + (it.ok ? ' ok' : '');
+        const i = document.createElement('i'); const sp = document.createElement('span'); sp.textContent = it.x;
+        r.append(i, sp); el.appendChild(r);
+      });
+      return el;
+    }));
+    if (alvo) requestAnimationFrame(() => { $('sem').scrollLeft = alvo.offsetLeft - 16; });
   }
 
   // Análises
