@@ -1,5 +1,5 @@
 // Service worker do app Treinador: recebe as mensagens e guarda o histórico.
-const CACHE = 'treinador-v2';
+const CACHE = 'treinador-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
@@ -60,6 +60,7 @@ self.addEventListener('push', (e) => {
     kind: data.kind || 'msg',
     treino: data.treino || null,
     texto: data.texto || null,
+    lesoes: data.lesoes || null,
   };
   e.waitUntil((async () => {
     await save(msg);

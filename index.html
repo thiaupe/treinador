@@ -15,14 +15,14 @@
 <style>
   :root {
     --bg: #111214; --card: #1b1d21; --line: #2a2d33; --text: #f3f1ee; --muted: #9a9ea6;
-    --accent: #ff5a1f; --accent-soft: rgba(255,90,31,.14); --ok: #3ccf7a;
+    --accent: #ff5a1f; --accent-soft: rgba(255,90,31,.14); --ok: #3ccf7a; --warn: #f2b33d; --bad: #ff5c5c;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; background: var(--bg); color: var(--text);
     font: 16px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
   main { max-width: 560px; margin: 0 auto;
-    padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 32px); }
-  header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 96px); }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
   header img { width: 44px; height: 44px; border-radius: 11px; }
   header h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; }
   header p { margin: 0; color: var(--muted); font-size: 14px; }
@@ -42,23 +42,49 @@
   textarea { width: 100%; min-height: 110px; background: #0c0d0f; color: var(--muted); border: 1px solid var(--line);
     border-radius: 10px; padding: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; margin: 10px 0; resize: none; }
   .msg { padding: 12px 0; border-top: 1px solid var(--line); }
-  .msg:first-of-type { border-top: 0; padding-top: 4px; }
+  .msg:first-child { border-top: 0; padding-top: 4px; }
   .msg .t { font-weight: 650; }
   .msg .b { margin-top: 2px; white-space: pre-line; }
   .msg .d { color: var(--muted); font-size: 12px; margin-top: 4px; }
   .empty { color: var(--muted); }
   .status { font-size: 14px; color: var(--muted); margin-top: 10px; }
   .status.ok { color: var(--ok); }
-  .analise .an-t { font-weight: 700; font-size: 18px; }
-  .analise .an-d { color: var(--muted); font-size: 12px; margin: 2px 0 10px; }
-  .analise .an-x { white-space: pre-line; }
+  .an-t { font-weight: 700; font-size: 18px; }
+  .an-d { color: var(--muted); font-size: 12px; margin: 2px 0 10px; }
+  .an-x { white-space: pre-line; }
   details { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
   details summary { color: var(--muted); font-size: 14px; cursor: pointer; }
-  details .old { padding: 10px 0; border-top: 1px solid var(--line); }
-  details .old:first-of-type { border-top: 0; }
-  .hidden { display: none; }
+  .old { padding: 12px 0; border-top: 1px solid var(--line); }
+  .old:first-child { border-top: 0; }
+  .hidden { display: none !important; }
+  .sub { color: var(--muted); font-size: 14px; margin: -2px 0 12px; }
+  ul.rot { list-style: none; margin: 0; padding: 0; }
+  ul.rot li { padding: 10px 0; border-top: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; }
+  ul.rot li:first-child { border-top: 0; padding-top: 2px; }
+  ul.rot .q { flex: 0 0 84px; color: var(--accent); font-weight: 650; font-size: 14px; font-variant-numeric: tabular-nums; }
+  ul.rot .x b { display: block; font-weight: 600; }
+  ul.rot .x span { color: var(--muted); font-size: 14px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; font-size: 14px; color: var(--muted); background: transparent; width: auto; font-weight: 600; }
+  .chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--text); }
+  .les { border-left: 3px solid var(--warn); padding: 2px 0 2px 12px; margin: 4px 0 14px; }
+  .les.alta { border-color: var(--bad); }
+  .les.ok { border-color: var(--ok); }
+  .les .lt { font-weight: 700; }
+  .les .lm { color: var(--muted); font-size: 13px; margin: 2px 0 6px; }
+  .les .lx { white-space: pre-line; }
+  .les .lc { margin-top: 8px; }
+  .les .lc b { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(17,18,20,.94); backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--line); display: flex; justify-content: center;
+    padding: 6px 8px calc(env(safe-area-inset-bottom) + 6px); z-index: 10; }
+  nav.tabs .in { display: flex; width: 100%; max-width: 560px; }
+  nav.tabs button { background: transparent; color: var(--muted); flex: 1; padding: 8px 4px; border-radius: 10px;
+    font-size: 12px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; }
+  nav.tabs button svg { width: 24px; height: 24px; }
+  nav.tabs button.on { color: var(--accent); }
+  nav.tabs .dot { position: absolute; top: 6px; left: calc(50% + 10px); width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
   footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 8px; }
-  footer a { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -67,12 +93,6 @@
     <img src="icons/icon-192.png" alt="">
     <div><h1>Treinador</h1><p>Maratona do Rio · 30/05/2027</p></div>
   </header>
-
-  <section class="count">
-    <div class="n" id="dias">–</div>
-    <div class="l" id="dias-l">dias para a largada</div>
-    <div class="g">Meta 4h00 · Supermeta 3h30</div>
-  </section>
 
   <section class="card hidden" id="c-install">
     <h2>Instale o app</h2>
@@ -100,59 +120,218 @@
     <div class="status" id="copiar-status"></div>
   </section>
 
-  <section class="card hidden" id="c-treino">
-    <h2 id="treino-h">Próximo treino</h2>
-    <div class="treino-nome" id="treino-nome"></div>
-    <div class="treino-det" id="treino-det"></div>
-  </section>
+  <!-- ABA HOJE -->
+  <div id="tab-hoje">
+    <section class="count">
+      <div class="n" id="dias">–</div>
+      <div class="l" id="dias-l">dias para a largada</div>
+      <div class="g">Meta 4h00 · Supermeta 3h30</div>
+    </section>
 
-  <section class="card analise hidden" id="c-analise">
-    <h2 id="an-h">Análise do treinador</h2>
-    <div class="an-t" id="an-t"></div>
-    <div class="an-d" id="an-d"></div>
-    <div class="an-x" id="an-x"></div>
-    <details id="an-old" class="hidden"><summary>Análises anteriores</summary><div id="an-lista"></div></details>
-  </section>
+    <section class="card hidden" id="c-treino">
+      <h2 id="treino-h">Próximo treino</h2>
+      <div class="treino-nome" id="treino-nome"></div>
+      <div class="treino-det" id="treino-det"></div>
+    </section>
 
-  <section class="card">
-    <h2>Mensagens do treinador</h2>
-    <div id="lista"><div class="empty">Nenhuma mensagem ainda. A primeira chega na véspera do próximo treino.</div></div>
-  </section>
+    <section class="card">
+      <h2>Mensagens de hoje</h2>
+      <div id="lista-hoje"><div class="empty">Nada hoje ainda.</div></div>
+      <details id="d-antes" class="hidden"><summary>Mensagens anteriores</summary><div id="lista-antes"></div></details>
+    </section>
 
-  <section id="c-cfg" class="hidden" style="margin-bottom:16px">
-    <button class="sec" id="b-mostrar">Mostrar código de ativação</button>
-  </section>
+    <section id="c-cfg" class="hidden" style="margin-bottom:16px">
+      <button class="sec" id="b-mostrar">Mostrar código de ativação</button>
+    </section>
+  </div>
 
-  <footer>Sem treino perdido. <span id="ver"></span></footer>
+  <!-- ABA ANÁLISES -->
+  <div id="tab-analises" class="hidden">
+    <section class="card" id="c-analise">
+      <h2 id="an-h">Análise do dia</h2>
+      <div id="an-vazio" class="empty">A análise chega todo dia às 8h47, e o resumo da semana no domingo.</div>
+      <div class="an-t" id="an-t"></div>
+      <div class="an-d" id="an-d"></div>
+      <div class="an-x" id="an-x"></div>
+    </section>
+    <section class="card hidden" id="c-an-old">
+      <h2>Análises anteriores</h2>
+      <div id="an-lista"></div>
+    </section>
+  </div>
+
+  <!-- ABA CORPO -->
+  <div id="tab-corpo" class="hidden">
+    <section class="card" id="c-lesoes">
+      <h2>Lesões e observações</h2>
+      <div id="les-lista"><div class="empty">Nenhuma observação ativa. Sentiu algo? Conte ao treinador no chat.</div></div>
+      <div class="an-d" id="les-d"></div>
+    </section>
+
+    <section class="card">
+      <h2>Alongamento e mobilidade</h2>
+      <div class="sub" id="rot-sub">Escolha o treino:</div>
+      <div class="chips" id="chips"></div>
+      <h2 style="margin-top:4px">Antes · aquecimento dinâmico</h2>
+      <ul class="rot" id="rot-antes"></ul>
+      <h2 style="margin-top:18px">Depois · alongamento</h2>
+      <ul class="rot" id="rot-depois"></ul>
+      <div id="rot-extra" class="hidden">
+        <h2 style="margin-top:18px">Extra por causa da lesão</h2>
+        <ul class="rot" id="rot-extra-l"></ul>
+      </div>
+    </section>
+  </div>
+
+  <footer>Sem treino perdido.</footer>
 </main>
+
+<nav class="tabs"><div class="in">
+  <button data-tab="hoje" class="on">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
+    Hoje<span class="dot hidden" id="dot-hoje"></span></button>
+  <button data-tab="analises">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+    Análises<span class="dot hidden" id="dot-analises"></span></button>
+  <button data-tab="corpo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v6l-3 7M12 13l3 7M7 10l5-2 5 2"/></svg>
+    Corpo<span class="dot hidden" id="dot-corpo"></span></button>
+</div></nav>
 
 <script>
 const VAPID_PUBLIC = 'BOmT2E6gz2XK19yfBcZ-t4B7MOHwW_cuNtcPiwVC-Gqn1_mzTLUh2-yPbO3nnl2kkfyrqv8ZThONT17slZ6k6Wc';
 const PROVA = new Date('2027-05-30T07:00:00-03:00');
 const $ = (id) => document.getElementById(id);
 
+// ---------- rotinas por tipo de treino ----------
+const ROTINAS = {
+  leve: {
+    nome: 'Leve',
+    antes: [
+      ['3 min', 'Caminhada rápida', 'Aquece tornozelo e panturrilha antes de trotar.'],
+      ['10 cada', 'Balanço de perna (frente/trás e lateral)', 'Apoiado num poste, solto e controlado.'],
+      ['15', 'Elevação de calcanhar', 'Sobe e desce devagar, os dois pés.'],
+      ['10 cada', 'Círculos de tornozelo', 'Nos dois sentidos.'],
+      ['1º km', 'Começar no lado lento da faixa', 'Deixa o corpo esquentar sozinho.'],
+    ],
+    depois: [
+      ['30s cada', 'Panturrilha na parede, joelho esticado', 'Gastrocnêmio. Calcanhar no chão.'],
+      ['30s cada', 'Panturrilha na parede, joelho dobrado', 'Sóleo, a parte de baixo e de dentro.'],
+      ['30s cada', 'Posterior de coxa', 'Pé num degrau, tronco reto, inclina do quadril.'],
+      ['30s cada', 'Quadríceps em pé', 'Calcanhar no glúteo, joelhos juntos.'],
+      ['30s cada', 'Flexor do quadril (avanço)', 'Joelho de trás no chão, quadril para frente.'],
+    ],
+  },
+  qualidade: {
+    nome: 'Qualidade',
+    antes: [
+      ['10–15 min', 'Trote leve (é o aquecimento do treino)', 'Sem pressa, faixa fácil.'],
+      ['10 cada', 'Balanço de perna (frente/trás e lateral)', ''],
+      ['2 × 20 m', 'Skipping baixo', 'Passada curta e rápida, apoio na ponta do pé.'],
+      ['2 × 20 m', 'Anfersen (calcanhar no glúteo)', 'Solto, sem travar o tronco.'],
+      ['3–4 × 80 m', 'Acelerações progressivas', 'Até perto do ritmo do tiro, depois solta.'],
+    ],
+    depois: [
+      ['10 min', 'Trote de desaquecimento', 'Não pule: tira a carga das pernas.'],
+      ['30s cada', 'Panturrilha na parede, joelho esticado', ''],
+      ['30s cada', 'Panturrilha na parede, joelho dobrado', 'Sóleo: tiros carregam muito ele.'],
+      ['30s cada', 'Posterior de coxa', ''],
+      ['30s cada', 'Glúteo (figura 4 deitado)', 'Tornozelo sobre o joelho oposto, puxa a coxa.'],
+      ['30s cada', 'Flexor do quadril (avanço)', ''],
+    ],
+  },
+  longao: {
+    nome: 'Longão',
+    antes: [
+      ['10 cada', 'Círculos de quadril', 'Mãos na cintura, amplo.'],
+      ['10 cada', 'Balanço de perna (frente/trás e lateral)', ''],
+      ['15', 'Elevação de calcanhar', ''],
+      ['10', 'Agachamento livre', 'Até onde for confortável.'],
+      ['2 km', 'Começar mais lento que o ritmo-alvo', 'Longão se ganha no fim, não no início.'],
+    ],
+    depois: [
+      ['5 min', 'Caminhar', 'Antes de parar e sentar.'],
+      ['30s cada', 'Panturrilha na parede, joelho esticado', ''],
+      ['30s cada', 'Panturrilha na parede, joelho dobrado', ''],
+      ['30s cada', 'Posterior de coxa', ''],
+      ['30s cada', 'Quadríceps em pé', ''],
+      ['30s cada', 'Glúteo (figura 4 deitado)', ''],
+      ['5 min', 'Pernas para cima na parede', 'Deitado, ajuda a recuperar.'],
+      ['1 min cada', 'Rolo na panturrilha e no quadríceps', 'Suave, sem dor.'],
+    ],
+  },
+  forca: {
+    nome: 'Força / descanso',
+    antes: [
+      ['5 min', 'Bike ou caminhada', 'Antes da musculação.'],
+      ['10 cada', 'Círculos de quadril e balanço de perna', ''],
+      ['10', 'Agachamento livre e avanço sem peso', ''],
+    ],
+    depois: [
+      ['30s cada', 'Panturrilha (joelho esticado e dobrado)', ''],
+      ['30s cada', 'Posterior de coxa e quadríceps', ''],
+      ['30s cada', 'Flexor do quadril e glúteo', ''],
+      ['1 min cada', 'Rolo em panturrilha, quadríceps e glúteo', 'Suave.'],
+    ],
+  },
+};
+
+function tipoDoTreino(nome) {
+  const n = (nome || '').toLowerCase();
+  if (/long/.test(n)) return 'longao';
+  if (/fartlek|tiro|limiar|interval|qualidade|ritmo|teste|progressiv/.test(n)) return 'qualidade';
+  if (/força|forca|descanso|pilates|muscula/.test(n)) return 'forca';
+  return 'leve';
+}
+
+let tipoSel = null;
+let extrasLesao = [];
+
+function renderRotina() {
+  const t = ROTINAS[tipoSel] || ROTINAS.leve;
+  const li = (arr) => arr.map(([q, b, s]) => {
+    const el = document.createElement('li');
+    const a = document.createElement('div'); a.className = 'q'; a.textContent = q;
+    const x = document.createElement('div'); x.className = 'x';
+    const bb = document.createElement('b'); bb.textContent = b; x.appendChild(bb);
+    if (s) { const sp = document.createElement('span'); sp.textContent = s; x.appendChild(sp); }
+    el.append(a, x); return el;
+  });
+  $('rot-antes').replaceChildren(...li(t.antes));
+  $('rot-depois').replaceChildren(...li(t.depois));
+  if (extrasLesao.length) {
+    $('rot-extra').classList.remove('hidden');
+    $('rot-extra-l').replaceChildren(...li(extrasLesao));
+  } else $('rot-extra').classList.add('hidden');
+  [...$('chips').children].forEach((c) => c.classList.toggle('on', c.dataset.t === tipoSel));
+}
+
+function montarChips() {
+  $('chips').replaceChildren(...Object.entries(ROTINAS).map(([k, v]) => {
+    const b = document.createElement('button'); b.className = 'chip'; b.dataset.t = k; b.textContent = v.nome;
+    b.onclick = () => { tipoSel = k; renderRotina(); };
+    return b;
+  }));
+}
+
+// ---------- utilidades ----------
 function contagem() {
-  const hoje = new Date();
-  const d = Math.ceil((PROVA - hoje) / 86400000);
+  const d = Math.ceil((PROVA - new Date()) / 86400000);
   $('dias').textContent = d > 0 ? d : '🏁';
   $('dias-l').textContent = d === 1 ? 'dia para a largada' : d > 0 ? 'dias para a largada' : 'É dia de prova!';
 }
-
 function isStandalone() {
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
-
 function b64urlToUint8(s) {
   const pad = '='.repeat((4 - (s.length % 4)) % 4);
   const raw = atob((s + pad).replace(/-/g, '+').replace(/_/g, '/'));
   return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
 }
-
 function codigoDe(sub) {
   const json = JSON.stringify(sub.toJSON ? sub.toJSON() : sub);
   return 'TREINADOR:' + btoa(unescape(encodeURIComponent(json)));
 }
-
 function db() {
   return new Promise((res, rej) => {
     const r = indexedDB.open('treinador', 1);
@@ -161,7 +340,6 @@ function db() {
     r.onerror = () => rej(r.error);
   });
 }
-
 async function mensagens() {
   try {
     const d = await db();
@@ -172,50 +350,45 @@ async function mensagens() {
     });
   } catch (_) { return []; }
 }
-
 function fmt(ts) {
-  try {
-    return new Date(ts).toLocaleString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-  } catch (_) { return ''; }
+  try { return new Date(ts).toLocaleString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+  catch (_) { return ''; }
 }
+function diaLocal(ts) { try { return new Date(ts).toLocaleDateString('pt-BR'); } catch (_) { return ''; } }
+function lido(tab) { try { return localStorage.getItem('lido-' + tab) || ''; } catch (_) { return ''; } }
+function marcarLido(tab, ts) { try { localStorage.setItem('lido-' + tab, ts); } catch (_) {} }
+
+function itemMsg(m, cls) {
+  const el = document.createElement('div'); el.className = cls;
+  const t = document.createElement('div'); t.className = cls === 'msg' ? 't' : 'an-t'; if (cls !== 'msg') t.style.fontSize = '16px'; t.textContent = m.title;
+  const b = document.createElement('div'); b.className = cls === 'msg' ? 'b' : 'an-x'; b.textContent = m.texto || m.body;
+  const d = document.createElement('div'); d.className = cls === 'msg' ? 'd' : 'an-d'; d.textContent = fmt(m.ts);
+  if (cls === 'msg') el.append(t, b, d); else el.append(t, d, b);
+  return el;
+}
+
+const ultimo = { hoje: '', analises: '', corpo: '' };
+let abaAtual = 'hoje';
 
 async function render() {
   const todas = (await mensagens()).sort((a, b) => (a.ts < b.ts ? 1 : -1));
   const ehAnalise = (m) => m.kind === 'analise' || m.kind === 'resumo';
+  const ehCorpo = (m) => m.kind === 'corpo';
   const ans = todas.filter(ehAnalise);
-  const ms = todas.filter((m) => !ehAnalise(m));
-  if (ans.length) {
-    const a = ans[0];
-    $('c-analise').classList.remove('hidden');
-    $('an-h').textContent = a.kind === 'resumo' ? 'Resumo da semana' : 'Análise do dia';
-    $('an-t').textContent = a.title;
-    $('an-d').textContent = fmt(a.ts);
-    $('an-x').textContent = a.texto || a.body;
-    if (ans.length > 1) {
-      $('an-old').classList.remove('hidden');
-      $('an-lista').innerHTML = '';
-      ans.slice(1, 30).forEach((o) => {
-        const el = document.createElement('div'); el.className = 'old';
-        const t = document.createElement('div'); t.className = 'an-t'; t.style.fontSize = '16px'; t.textContent = o.title;
-        const d = document.createElement('div'); d.className = 'an-d'; d.textContent = fmt(o.ts);
-        const x = document.createElement('div'); x.className = 'an-x'; x.textContent = o.texto || o.body;
-        el.append(t, d, x); $('an-lista').appendChild(el);
-      });
-    }
+  const corpo = todas.filter(ehCorpo);
+  const ms = todas.filter((m) => !ehAnalise(m) && !ehCorpo(m));
+
+  // Hoje
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  const msHoje = ms.filter((m) => diaLocal(m.ts) === hoje);
+  const msAntes = ms.filter((m) => diaLocal(m.ts) !== hoje);
+  if (msHoje.length) $('lista-hoje').replaceChildren(...msHoje.map((m) => itemMsg(m, 'msg')));
+  else $('lista-hoje').innerHTML = '<div class="empty">Nada hoje ainda.</div>';
+  if (msAntes.length) {
+    $('d-antes').classList.remove('hidden');
+    $('lista-antes').replaceChildren(...msAntes.slice(0, 40).map((m) => itemMsg(m, 'msg')));
   }
-  if (ms.length) {
-    $('lista').innerHTML = '';
-    ms.slice(0, 40).forEach((m) => {
-      const el = document.createElement('div');
-      el.className = 'msg';
-      const t = document.createElement('div'); t.className = 't'; t.textContent = m.title;
-      const b = document.createElement('div'); b.className = 'b'; b.textContent = m.texto || m.body;
-      const d = document.createElement('div'); d.className = 'd'; d.textContent = fmt(m.ts);
-      el.append(t, b, d);
-      $('lista').appendChild(el);
-    });
-  }
-  const comTreino = ms.find((m) => m.treino && m.treino.nome);
+  const comTreino = todas.find((m) => m.treino && m.treino.nome);
   if (comTreino) {
     const t = comTreino.treino;
     $('c-treino').classList.remove('hidden');
@@ -223,19 +396,84 @@ async function render() {
     $('treino-nome').textContent = t.nome;
     $('treino-det').textContent = t.detalhe || '';
   }
+
+  // Análises
+  if (ans.length) {
+    const a = ans[0];
+    $('an-vazio').classList.add('hidden');
+    $('an-h').textContent = a.kind === 'resumo' ? 'Resumo da semana' : 'Análise do dia';
+    $('an-t').textContent = a.title;
+    $('an-d').textContent = fmt(a.ts);
+    $('an-x').textContent = a.texto || a.body;
+    if (ans.length > 1) {
+      $('c-an-old').classList.remove('hidden');
+      $('an-lista').replaceChildren(...ans.slice(1, 30).map((o) => itemMsg(o, 'old')));
+    }
+  }
+
+  // Corpo
+  extrasLesao = [];
+  if (corpo.length) {
+    const c = corpo[0];
+    const lesoes = Array.isArray(c.lesoes) ? c.lesoes : [];
+    if (lesoes.length) {
+      $('les-lista').replaceChildren(...lesoes.map((l) => {
+        const el = document.createElement('div');
+        el.className = 'les' + (l.nivel === 'alta' ? ' alta' : l.nivel === 'ok' ? ' ok' : '');
+        const t = document.createElement('div'); t.className = 'lt'; t.textContent = l.local;
+        const m = document.createElement('div'); m.className = 'lm';
+        m.textContent = [l.dor != null ? 'Dor ' + l.dor + '/10' : '', l.status || ''].filter(Boolean).join(' · ');
+        el.append(t, m);
+        if (l.obs) { const x = document.createElement('div'); x.className = 'lx'; x.textContent = l.obs; el.appendChild(x); }
+        if (l.cuidado) {
+          const cc = document.createElement('div'); cc.className = 'lc';
+          const b = document.createElement('b'); b.textContent = 'Cuidados';
+          const x = document.createElement('div'); x.className = 'lx'; x.textContent = l.cuidado;
+          cc.append(b, x); el.appendChild(cc);
+        }
+        if (l.alerta) {
+          const cc = document.createElement('div'); cc.className = 'lc';
+          const b = document.createElement('b'); b.textContent = 'Sinal de alerta';
+          const x = document.createElement('div'); x.className = 'lx'; x.textContent = l.alerta;
+          cc.append(b, x); el.appendChild(cc);
+        }
+        if (Array.isArray(l.extras)) extrasLesao.push(...l.extras);
+        return el;
+      }));
+    } else {
+      $('les-lista').innerHTML = '<div class="empty">Nenhuma observação ativa. Sentiu algo? Conte ao treinador no chat.</div>';
+    }
+    $('les-d').textContent = 'Atualizado ' + fmt(c.ts);
+  }
+  if (!tipoSel) tipoSel = comTreino ? tipoDoTreino(comTreino.treino.nome) : 'leve';
+  $('rot-sub').textContent = comTreino ? 'Sugerido para: ' + comTreino.treino.nome + '. Toque para trocar.' : 'Escolha o treino:';
+  renderRotina();
+
+  // pontos de novidade
+  ultimo.hoje = ms[0] ? ms[0].ts : ''; ultimo.analises = ans[0] ? ans[0].ts : ''; ultimo.corpo = corpo[0] ? corpo[0].ts : '';
+  marcarLido(abaAtual, ultimo[abaAtual]);
+  ['hoje', 'analises', 'corpo'].forEach((k) => $('dot-' + k).classList.toggle('hidden', !ultimo[k] || ultimo[k] <= lido(k) || k === abaAtual));
 }
 
+function abrirAba(tab) {
+  abaAtual = tab;
+  ['hoje', 'analises', 'corpo'].forEach((k) => $('tab-' + k).classList.toggle('hidden', k !== tab));
+  document.querySelectorAll('nav.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+  marcarLido(tab, ultimo[tab]);
+  $('dot-' + tab).classList.add('hidden');
+  window.scrollTo(0, 0);
+  try { localStorage.setItem('aba', tab); } catch (_) {}
+}
+document.querySelectorAll('nav.tabs button').forEach((b) => b.addEventListener('click', () => abrirAba(b.dataset.tab)));
+
+// ---------- notificações ----------
 async function swReg() {
   if (!('serviceWorker' in navigator)) return null;
   return navigator.serviceWorker.register('sw.js');
 }
-
 async function estado() {
   const suportaPush = 'PushManager' in window && 'Notification' in window;
-  if (!isStandalone() && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
-    $('c-install').classList.remove('hidden');
-    return;
-  }
+  if (!isStandalone() && /iPhone|iPad|iPod/.test(navigator.userAgent)) { $('c-install').classList.remove('hidden'); return; }
   if (!suportaPush) {
     $('c-ativar').classList.remove('hidden');
     $('ativar-txt').textContent = 'Este navegador não recebe notificações. No iPhone, precisa do iOS 16.4 ou mais novo e do app aberto pela tela de início.';
@@ -244,52 +482,35 @@ async function estado() {
   }
   const reg = await navigator.serviceWorker.ready;
   const sub = await reg.pushManager.getSubscription();
-  if (sub && Notification.permission === 'granted') {
-    $('c-cfg').classList.remove('hidden');
-    $('codigo').value = codigoDe(sub);
-  } else {
-    $('c-ativar').classList.remove('hidden');
-  }
+  if (sub && Notification.permission === 'granted') { $('c-cfg').classList.remove('hidden'); $('codigo').value = codigoDe(sub); }
+  else $('c-ativar').classList.remove('hidden');
 }
-
 $('b-ativar').addEventListener('click', async () => {
   $('ativar-status').textContent = 'Ativando…';
   try {
     const perm = await Notification.requestPermission();
-    if (perm !== 'granted') {
-      $('ativar-status').textContent = 'Permissão negada. Em Ajustes › Notificações › Treinador, ative e tente de novo.';
-      return;
-    }
+    if (perm !== 'granted') { $('ativar-status').textContent = 'Permissão negada. Em Ajustes › Notificações › Treinador, ative e tente de novo.'; return; }
     const reg = await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64urlToUint8(VAPID_PUBLIC) });
     $('codigo').value = codigoDe(sub);
-    $('c-ativar').classList.add('hidden');
-    $('c-codigo').classList.remove('hidden');
-    $('c-cfg').classList.remove('hidden');
-  } catch (err) {
-    $('ativar-status').textContent = 'Não deu certo: ' + (err && err.message ? err.message : err);
-  }
+    $('c-ativar').classList.add('hidden'); $('c-codigo').classList.remove('hidden'); $('c-cfg').classList.remove('hidden');
+  } catch (err) { $('ativar-status').textContent = 'Não deu certo: ' + (err && err.message ? err.message : err); }
 });
-
 $('b-copiar').addEventListener('click', async () => {
   const v = $('codigo').value;
-  try { await navigator.clipboard.writeText(v); }
-  catch (_) { $('codigo').select(); document.execCommand('copy'); }
+  try { await navigator.clipboard.writeText(v); } catch (_) { $('codigo').select(); document.execCommand('copy'); }
   $('copiar-status').textContent = 'Copiado. Agora cole na conversa com o treinador.';
   $('copiar-status').classList.add('ok');
 });
+$('b-mostrar').addEventListener('click', () => $('c-codigo').classList.toggle('hidden'));
 
-$('b-mostrar').addEventListener('click', () => {
-  $('c-codigo').classList.toggle('hidden');
-});
-
-navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', (e) => {
-  if (e.data && e.data.type === 'nova-mensagem') render();
-});
+navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', (e) => { if (e.data && e.data.type === 'nova-mensagem') render(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { contagem(); render(); } });
 
+montarChips();
 contagem();
+try { const a = localStorage.getItem('aba'); if (a && $('tab-' + a)) abrirAba(a); } catch (_) {}
 swReg().then(() => estado()).catch(() => {});
 render();
 </script>
