@@ -209,7 +209,7 @@ async function render() {
       const el = document.createElement('div');
       el.className = 'msg';
       const t = document.createElement('div'); t.className = 't'; t.textContent = m.title;
-      const b = document.createElement('div'); b.className = 'b'; b.textContent = m.body;
+      const b = document.createElement('div'); b.className = 'b'; b.textContent = m.texto || m.body;
       const d = document.createElement('div'); d.className = 'd'; d.textContent = fmt(m.ts);
       el.append(t, b, d);
       $('lista').appendChild(el);
