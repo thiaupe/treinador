@@ -71,6 +71,20 @@
   .dia .it.ok span::after { content: ' ✓'; color: var(--ok); font-weight: 700; }
   .leg { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--muted); font-size: 12px; margin-top: 10px; }
   .leg span { display: inline-flex; align-items: center; gap: 5px; } .leg i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .peso-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+  .peso-n { font-size: 40px; font-weight: 800; letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .peso-n small { font-size: 16px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+  .peso-l { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .peso-delta { font-weight: 700; font-size: 15px; text-align: right; }
+  .peso-delta.down { color: var(--ok); } .peso-delta.up { color: var(--warn); }
+  .peso-meta { margin-top: 14px; }
+  .bar { height: 8px; border-radius: 99px; background: #2a2d33; overflow: hidden; margin: 6px 0 4px; }
+  .bar > div { height: 100%; background: var(--accent); border-radius: 99px; }
+  .peso-row { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; }
+  .peso-svg { width: 100%; height: 110px; margin-top: 14px; display: block; }
+  .peso-dias { display: flex; gap: 6px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+  .peso-dias div { flex: 0 0 auto; background: #15171a; border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; text-align: center; font-size: 12px; color: var(--muted); }
+  .peso-dias b { display: block; color: var(--text); font-size: 14px; font-variant-numeric: tabular-nums; }
   .hidden { display: none !important; }
   .sub { color: var(--muted); font-size: 14px; margin: -2px 0 12px; }
   ul.rot { list-style: none; margin: 0; padding: 0; }
@@ -205,6 +219,23 @@
 
   <!-- ABA CORPO -->
   <div id="tab-corpo" class="hidden">
+    <section class="card" id="c-peso">
+      <h2>Peso</h2>
+      <div id="peso-vazio" class="empty">Mande seu peso no chat do treinador todo dia. Aqui vale a média da semana, não o número do dia.</div>
+      <div id="peso-box" class="hidden">
+        <div class="peso-top">
+          <div><div class="peso-n" id="peso-media">–<small>kg</small></div><div class="peso-l" id="peso-media-l">média dos últimos 7 dias</div></div>
+          <div><div class="peso-delta" id="peso-delta"></div><div class="peso-l" id="peso-ult" style="text-align:right"></div></div>
+        </div>
+        <div class="peso-meta">
+          <div class="peso-row"><span id="peso-ini"></span><span id="peso-alvo"></span></div>
+          <div class="bar"><div id="peso-bar" style="width:0%"></div></div>
+          <div class="peso-l" id="peso-ritmo"></div>
+        </div>
+        <svg class="peso-svg" id="peso-svg" viewBox="0 0 320 110" preserveAspectRatio="none"></svg>
+        <div class="peso-dias" id="peso-dias"></div>
+      </div>
+    </section>
     <section class="card" id="c-lesoes">
       <h2>Lesões e observações</h2>
       <div id="les-lista"><div class="empty">Nenhuma observação ativa. Sentiu algo? Conte ao treinador no chat.</div></div>
@@ -594,6 +625,66 @@ function renderNutAnalise(lista) {
   }
 }
 
+
+// ---------- peso ----------
+const PESO_META = { de: 77, ate: 78, quando: 'março/2027', porSemana: [0.3, 0.4] };
+function isoDia(d) { return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
+function renderPeso(todas) {
+  const mapa = {};
+  // mensagens antigas primeiro, as novas sobrescrevem
+  [...todas].reverse().forEach((m) => {
+    if (Array.isArray(m.pesos)) m.pesos.forEach((p) => { if (p && p.d && p.kg) mapa[p.d] = +p.kg; });
+    if (m.peso && m.peso.d && m.peso.kg) mapa[m.peso.d] = +m.peso.kg;
+  });
+  const dias = Object.keys(mapa).sort();
+  if (!dias.length) return;
+  $('peso-vazio').classList.add('hidden'); $('peso-box').classList.remove('hidden');
+  const fmtKg = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const ultimoDia = dias[dias.length - 1];
+  const fim = new Date(ultimoDia + 'T12:00:00');
+  const janela = (offset) => {
+    const vals = [];
+    for (let i = 0; i < 7; i++) { const d = new Date(fim); d.setDate(d.getDate() - i - offset); const k = isoDia(d); if (mapa[k]) vals.push(mapa[k]); }
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+  };
+  const media = janela(0), anterior = janela(7);
+  const nMedia = dias.filter((k) => k > isoDia(new Date(fim.getTime() - 7 * 864e5))).length;
+  $('peso-media').innerHTML = fmtKg(media) + '<small>kg</small>';
+  $('peso-media-l').textContent = 'média de 7 dias' + (nMedia < 7 ? ' (' + nMedia + ' registro' + (nMedia > 1 ? 's' : '') + ')' : '');
+  if (anterior != null) {
+    const dlt = media - anterior;
+    $('peso-delta').textContent = (dlt > 0 ? '+' : dlt < 0 ? '−' : '') + fmtKg(Math.abs(dlt)) + ' kg';
+    $('peso-delta').className = 'peso-delta ' + (dlt < -0.05 ? 'down' : dlt > 0.05 ? 'up' : '');
+  } else { $('peso-delta').textContent = ''; }
+  const dUlt = new Date(ultimoDia + 'T12:00:00');
+  $('peso-ult').textContent = (anterior != null ? 'vs semana anterior · ' : '') + 'último: ' + fmtKg(mapa[ultimoDia]) + ' em ' + dUlt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  const ini = mapa[dias[0]];
+  const alvo = PESO_META.ate;
+  const prog = Math.max(0, Math.min(1, (ini - media) / (ini - alvo)));
+  $('peso-ini').textContent = 'Início ' + fmtKg(ini);
+  $('peso-alvo').textContent = 'Meta ' + PESO_META.de + '–' + PESO_META.ate + ' kg até ' + PESO_META.quando;
+  $('peso-bar').style.width = (prog * 100).toFixed(0) + '%';
+  $('peso-ritmo').textContent = 'Faltam ' + fmtKg(Math.max(0, media - alvo)) + ' kg. Ritmo saudável: 0,3–0,4 kg por semana na média.';
+  // gráfico: pontos diários + linha da média móvel de 7 dias
+  const ult = dias.slice(-42);
+  const t0 = new Date(ult[0] + 'T12:00:00').getTime(), t1 = Math.max(t0 + 6 * 864e5, fim.getTime());
+  const movel = ult.map((k) => { const f = new Date(k + 'T12:00:00'); const v = []; for (let i = 0; i < 7; i++) { const d = new Date(f); d.setDate(d.getDate() - i); const kk = isoDia(d); if (mapa[kk]) v.push(mapa[kk]); } return v.reduce((a, b) => a + b, 0) / v.length; });
+  const todosV = ult.map((k) => mapa[k]).concat([alvo]);
+  const lo = Math.min(...todosV) - 0.4, hi = Math.max(...todosV) + 0.4;
+  const X = (k) => 8 + (new Date(k + 'T12:00:00').getTime() - t0) / (t1 - t0) * 304;
+  const Y = (v) => 8 + (hi - v) / (hi - lo) * 94;
+  let svg = '<line x1="0" x2="320" y1="' + Y(alvo).toFixed(1) + '" y2="' + Y(alvo).toFixed(1) + '" stroke="#3ccf7a" stroke-dasharray="4 4" stroke-width="1" vector-effect="non-scaling-stroke"/>';
+  svg += ult.map((k) => '<circle cx="' + X(k).toFixed(1) + '" cy="' + Y(mapa[k]).toFixed(1) + '" r="2.5" fill="#9a9ea6"/>').join('');
+  if (ult.length > 1) svg += '<polyline fill="none" stroke="#ff5a1f" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" points="' + ult.map((k, i) => X(k).toFixed(1) + ',' + Y(movel[i]).toFixed(1)).join(' ') + '"/>';
+  $('peso-svg').innerHTML = svg;
+  $('peso-dias').replaceChildren(...dias.slice(-7).reverse().map((k) => {
+    const el = document.createElement('div'); const d = new Date(k + 'T12:00:00');
+    const b = document.createElement('b'); b.textContent = fmtKg(mapa[k]);
+    el.append(b, document.createTextNode(d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' }).replace('.', '')));
+    return el;
+  }));
+}
+
 // ---------- utilidades ----------
 function contagem() {
   const d = Math.ceil((PROVA - new Date()) / 86400000);
@@ -654,7 +745,7 @@ async function render() {
   const todas = (await mensagens()).sort((a, b) => (a.ts < b.ts ? 1 : -1));
   const ehAnalise = (m) => m.kind === 'analise' || m.kind === 'resumo';
   const ehCorpo = (m) => m.kind === 'corpo';
-  const ehSemana = (m) => m.kind === 'semana';
+  const ehSemana = (m) => m.kind === 'semana' || m.kind === 'peso';
   const ehNutri = (m) => m.kind === 'nutricao';
   const nutris = todas.filter(ehNutri);
   const ans = todas.filter(ehAnalise);
@@ -720,6 +811,9 @@ async function render() {
       $('an-lista').replaceChildren(...ans.slice(1, 30).map((o) => itemMsg(o, 'old')));
     }
   }
+
+  // Peso
+  renderPeso(todas);
 
   // Corpo
   extrasLesao = [];
