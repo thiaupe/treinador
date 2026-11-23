@@ -99,6 +99,28 @@
   nav.tabs button svg { width: 24px; height: 24px; }
   nav.tabs button.on { color: var(--accent); }
   nav.tabs .dot { position: absolute; top: 6px; left: calc(50% + 10px); width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .nut-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .nut-kcal { font-size: 34px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .nut-kcal small { font-size: 15px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+  .macros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+  .macro { background: #15171a; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+  .macro b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+  .macro span { color: var(--muted); font-size: 12px; }
+  .nota { color: var(--muted); font-size: 13px; margin-top: 10px; white-space: pre-line; }
+  .bar { margin-top: 10px; }
+  .bar .bl { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
+  .bar .bl b { color: var(--text); font-weight: 600; }
+  .bar .bt { height: 8px; background: #15171a; border-radius: 99px; overflow: hidden; margin-top: 4px; border: 1px solid var(--line); }
+  .bar .bf { height: 100%; background: var(--ok); border-radius: 99px; }
+  .bar .bf.baixo { background: var(--warn); } .bar .bf.alto { background: var(--bad); }
+  ul.ref li .q { flex-basis: 96px; }
+  .troca { padding: 10px 0; border-top: 1px solid var(--line); }
+  .troca:first-child { border-top: 0; padding-top: 2px; }
+  .troca .de { color: var(--muted); font-size: 14px; text-decoration: line-through; text-decoration-color: rgba(154,158,166,.5); }
+  .troca .pa { font-weight: 600; margin-top: 2px; }
+  .troca .pq { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  ul.dicas { margin: 0; padding-left: 18px; } ul.dicas li { margin: 6px 0; }
+  nav.tabs button { font-size: 11px; }
   footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 8px; }
 </style>
 </head>
@@ -204,6 +226,61 @@
     </section>
   </div>
 
+  <!-- ABA NUTRIÇÃO -->
+  <div id="tab-nutri" class="hidden">
+    <section class="card">
+      <h2 id="nut-h">Alvo de hoje</h2>
+      <div class="chips" id="nut-chips"></div>
+      <div class="nut-top"><div class="nut-kcal" id="nut-kcal"></div></div>
+      <div class="macros">
+        <div class="macro"><b id="nut-c"></b><span>carbo</span></div>
+        <div class="macro"><b id="nut-p"></b><span>proteína</span></div>
+        <div class="macro"><b id="nut-g"></b><span>gordura</span></div>
+      </div>
+      <div class="nota" id="nut-nota"></div>
+    </section>
+
+    <section class="card">
+      <h2>Cardápio sugerido</h2>
+      <ul class="rot ref" id="nut-menu"></ul>
+    </section>
+
+    <section class="card" id="c-nut-an">
+      <h2 id="nan-h">Análise da alimentação</h2>
+      <div id="nan-vazio" class="empty">Ainda sem análise. Mande as fotos das refeições na conversa de nutrição com o treinador; o balanço do dia aparece aqui.</div>
+      <div id="nan-box" class="hidden">
+        <div class="an-t" id="nan-t"></div>
+        <div class="an-d" id="nan-d"></div>
+        <div id="nan-bars"></div>
+        <ul class="rot ref" id="nan-ref" style="margin-top:12px"></ul>
+        <div class="an-x" id="nan-x" style="margin-top:10px"></div>
+        <div class="nota">Estimativa por foto/texto: erro de 20–30%. Serve para orientar, não para contar grama.</div>
+      </div>
+      <details id="nan-old-d" class="hidden"><summary>Dias anteriores</summary><div id="nan-old"></div></details>
+    </section>
+
+    <section class="card">
+      <h2>Jantar e lanches · trocas</h2>
+      <div class="sub">O jantar é a maior alavanca. Não é proibir: 2 jantares livres por semana (sábado pós-longão + 1 à escolha, nunca quarta nem sexta, que são véspera de qualidade e de longão).</div>
+      <div id="nut-trocas"></div>
+    </section>
+
+    <section class="card">
+      <h2>Treino, água e peso</h2>
+      <ul class="dicas" id="nut-dicas"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Como registrar</h2>
+      <ul class="dicas">
+        <li>Tire foto de cada refeição, de cima, antes de comer. Mande na conversa de nutrição com o treinador (pode juntar várias de uma vez).</li>
+        <li>Junto, escreva a hora e o que a foto não mostra: bebida, repetiu, quanto comeu da pizza, molho, sobremesa.</li>
+        <li>No fim do dia, mande o jantar ou "fechei o dia": o balanço completo aparece aqui em "Análise da alimentação".</li>
+        <li>Lanche sem foto? Texto basta: "16h, café com 1 fatia de bolo".</li>
+      </ul>
+    </section>
+  </div>
+
   <footer>Sem treino perdido.</footer>
 </main>
 
@@ -217,6 +294,9 @@
   <button data-tab="corpo">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v6l-3 7M12 13l3 7M7 10l5-2 5 2"/></svg>
     Corpo<span class="dot hidden" id="dot-corpo"></span></button>
+  <button data-tab="nutri">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10"/><path d="M17 21V3c-2 1.5-3 4-3 7v3h3"/></svg>
+    Nutrição<span class="dot hidden" id="dot-nutri"></span></button>
 </div></nav>
 
 <script>
@@ -335,6 +415,185 @@ function montarChips() {
   }));
 }
 
+// ---------- nutrição ----------
+// Base: 83 kg, 1,74 m, 31 anos. Proteína ~1,9 g/kg todo dia; carbo acompanha o treino.
+// Déficit fica nos dias leves e de descanso; qualidade e longão comem para render.
+const NUTRI = {
+  descanso: {
+    nome: 'Descanso', kcal: 2100, c: 220, p: 160, g: 65,
+    nota: 'Dia de déficit: menos carbo, proteína igual. Com Pilates (quarta) vale o mesmo.',
+    menu: [
+      ['Café 7h', '2 ovos mexidos + 1 pão francês ou 2 fatias integrais + 1 fruta + café com leite', '~450 kcal'],
+      ['Lanche 10h', 'Iogurte natural ou grego + 1 fruta (no lugar do pão)', '~200 kcal'],
+      ['Almoço', 'Metade do prato salada/legumes, 4 col. de arroz, 1 concha de feijão, 1 filé (frango, peixe ou carne magra)', '~650 kcal'],
+      ['Café 16h', 'Café + 1 pão com queijo branco ou peito de peru, ou whey com leite', '~250 kcal'],
+      ['Jantar', 'Prato de proteína + legumes + pouco carbo. Ver trocas abaixo', '~550 kcal'],
+    ],
+  },
+  forca: {
+    nome: 'Força', kcal: 2300, c: 270, p: 165, g: 65,
+    nota: 'Musculação à noite: o jantar é o pós-treino, com 40 g de proteína.',
+    menu: [
+      ['Café 7h', '2 ovos + 1 pão francês ou tapioca média + 1 fruta + café com leite', '~450 kcal'],
+      ['Lanche 10h', 'Iogurte grego + 1 fruta, ou pão com ovo', '~220 kcal'],
+      ['Almoço', 'Salada, 5 col. de arroz, 1 concha de feijão, 1 filé', '~700 kcal'],
+      ['Café 16h', 'Pão com queijo branco + 1 banana (energia para a academia)', '~300 kcal'],
+      ['Jantar pós-força', '150–180 g de frango, carne ou peixe + arroz ou batata + legumes', '~650 kcal'],
+    ],
+  },
+  leve: {
+    nome: 'Leve', kcal: 2500, c: 320, p: 160, g: 65,
+    nota: 'Leve de até 1h: dá para ir só com café ou 1 banana. O café da manhã depois é a refeição de recuperação.',
+    menu: [
+      ['Antes (opcional)', '1 banana ou café com 1 torrada, 300–500 ml de água', '~100 kcal'],
+      ['Café pós-treino', '2–3 ovos + 2 pães ou tapioca + 1 fruta + café com leite', '~600 kcal'],
+      ['Lanche 10h', 'Iogurte grego + fruta + 2 col. de granola', '~250 kcal'],
+      ['Almoço', 'Salada, 6 col. de arroz, 1 concha de feijão, 1 filé', '~750 kcal'],
+      ['Café 16h', 'Pão com queijo branco ou peito de peru + café', '~250 kcal'],
+      ['Jantar', 'Proteína + carbo moderado + legumes. Ver trocas', '~550 kcal'],
+    ],
+  },
+  qualidade: {
+    nome: 'Qualidade', kcal: 3300, c: 500, p: 160, g: 70,
+    nota: 'Sem déficit hoje: o alvo já conta com o futevôlei à noite. Faltar carbo aqui custa o longão de sábado.',
+    menu: [
+      ['Antes 5h15', '1 banana + 1 pão ou 2 torradas com mel/geleia + café + 300–500 ml de água', '~250 kcal'],
+      ['Café pós-treino', '3 ovos ou whey + 2 pães ou tapioca grande + fruta + leite com achocolatado ou suco', '~750 kcal'],
+      ['Lanche 10h', 'Iogurte + granola + fruta (aqui pão/bolo também cabe)', '~350 kcal'],
+      ['Almoço', 'Salada, 8 col. de arroz ou massa, feijão, 1 filé grande', '~900 kcal'],
+      ['Café 16h (pré-futevôlei)', 'Sanduíche de pão com queijo/peito de peru + fruta + café', '~400 kcal'],
+      ['Jantar pós-futevôlei', 'Massa ou arroz + frango/carne + legumes. Beba bem: muito suor na areia', '~650 kcal'],
+    ],
+  },
+  longao: {
+    nome: 'Longão', kcal: 3500, c: 540, p: 160, g: 75,
+    nota: 'Sexta à noite: jantar leve de carbo (massa/arroz + frango), nada de pizza gordurosa ou hambúrguer. Sábado: comer bem, jantar livre liberado.',
+    menu: [
+      ['Antes 5h', '2 pães ou 4 torradas com mel/geleia + 1 banana + café + 400–500 ml de água', '~400 kcal'],
+      ['Durante', 'Acima de 75 min: 30–60 g de carbo por hora (1 gel a cada 30–40 min a partir dos 40 min) + água/isotônico', '~200 kcal'],
+      ['Até 1h depois', '400 ml de leite com achocolatado ou whey + banana + pão', '~500 kcal'],
+      ['Café/almoço', 'Ovos, pão, fruta; almoço grande com arroz ou massa, feijão e proteína', '~1100 kcal'],
+      ['Lanche', 'Iogurte + fruta + granola, ou pão com queijo', '~350 kcal'],
+      ['Jantar livre', 'Pizza ou hambúrguer com a Nicole liberado. Só começa com salada e para quando saciar', '~900 kcal'],
+    ],
+  },
+};
+const TROCAS = [
+  ['Pizza (4–5 fatias + refri ≈ 1.500 kcal)', '2 fatias + salada grande antes + refri zero', 'Sabores com proteína (frango, atum, marguerita), massa fina, sem borda recheada. Ou pizza caseira em pão sírio/rap10 com frango e queijo.'],
+  ['Hambúrguer + batata frita + refri (≈ 1.600 kcal)', 'Hambúrguer caseiro: pão normal, blend 150 g, queijo, salada', 'Batata assada ou na air fryer, refri zero. Na rua: 1 hambúrguer simples sem a batata grande.'],
+  ['Pão à noite com frios', 'Omelete de 3 ovos + 1 pão + queijo branco + tomate', 'Mesmo ritual, com proteína de verdade e metade das calorias.'],
+  ['Pedido de delivery', 'Poke, comida árabe (kafta/frango + coalhada + salada), frango grelhado, sushi sem cream cheese', 'Escolha que mata a vontade de "pedir comida" sem virar 1.500 kcal.'],
+  ['Pão ou bolo às 10h e às 16h', 'Iogurte grego + fruta, pão com ovo, tapioca com ovo, whey com leite', 'Os dois lanches viram 25–40 g de proteína. Bolo fica para dia de qualidade ou longão.'],
+  ['Cerveja/drink', 'No máximo no jantar livre, nunca na véspera de qualidade ou longão', 'Álcool piora o sono e a recuperação, e soma calorias fácil.'],
+];
+const DICAS = [
+  'Água: ~3 L por dia de base. Urina amarelo-clara é o alvo.',
+  'Treino acima de 60 min no calor do Rio: 400–800 ml por hora, com sódio (isotônico ou cápsula de sal) nos longões acima de 90 min.',
+  'Pós-qualidade e pós-longão: até 1h depois, 20–40 g de proteína + carbo. Achocolatado ou whey com banana resolve.',
+  'Treine o estômago: use gel nos longões desde já. Na prova não se testa nada novo.',
+  'Peso: pese 3× por semana em jejum, depois do banheiro, e olhe a média da semana. Um dia isolado não diz nada.',
+  'Meta: 77–78 kg até a meia de março, uns 0,3–0,4 kg por semana. Mais rápido que 0,7 kg/semana é perder músculo e rendimento.',
+  'A partir de abril (fase específica, pico de volume): para o déficit e come para manter.',
+];
+
+function tipoNutri(itens) {
+  const its = itens || [];
+  const corrida = its.find((i) => i.t === 'corrida');
+  if (corrida) {
+    const n = (corrida.x || '').toLowerCase();
+    if (/long/.test(n)) return 'longao';
+    if (/fartlek|tiro|limiar|interval|qualidade|ritmo|teste|progressiv|meia|prova/.test(n)) return 'qualidade';
+    return 'leve';
+  }
+  if (its.some((i) => i.t === 'forca')) return 'forca';
+  return 'descanso';
+}
+
+let nutSel = null;
+let nutAuto = null;
+let nutFutevolei = false;
+
+function montarNutChips() {
+  $('nut-chips').replaceChildren(...Object.entries(NUTRI).map(([k, v]) => {
+    const b = document.createElement('button'); b.className = 'chip'; b.dataset.t = k; b.textContent = v.nome;
+    b.onclick = () => { nutSel = k; renderNutri(); };
+    return b;
+  }));
+  $('nut-trocas').replaceChildren(...TROCAS.map(([de, pa, pq]) => {
+    const el = document.createElement('div'); el.className = 'troca';
+    const a = document.createElement('div'); a.className = 'de'; a.textContent = de;
+    const b = document.createElement('div'); b.className = 'pa'; b.textContent = '→ ' + pa;
+    const c = document.createElement('div'); c.className = 'pq'; c.textContent = pq;
+    el.append(a, b, c); return el;
+  }));
+  $('nut-dicas').replaceChildren(...DICAS.map((d) => { const li = document.createElement('li'); li.textContent = d; return li; }));
+}
+
+function renderNutri() {
+  const k = nutSel || nutAuto || 'descanso';
+  const t = NUTRI[k];
+  $('nut-h').textContent = nutAuto && k === nutAuto ? 'Alvo de hoje · ' + t.nome : 'Alvo · dia de ' + t.nome.toLowerCase();
+  $('nut-kcal').innerHTML = '';
+  $('nut-kcal').append(document.createTextNode('~' + t.kcal.toLocaleString('pt-BR')));
+  const sm = document.createElement('small'); sm.textContent = 'kcal'; $('nut-kcal').appendChild(sm);
+  $('nut-c').textContent = t.c + ' g'; $('nut-p').textContent = t.p + ' g'; $('nut-g').textContent = t.g + ' g';
+  let nota = t.nota;
+  if (nutFutevolei && k === nutAuto && k !== 'qualidade') nota += '\nTem futevôlei hoje: some ~400 kcal, quase tudo em carbo.';
+  $('nut-nota').textContent = nota;
+  $('nut-menu').replaceChildren(...t.menu.map(([q, b, s]) => {
+    const el = document.createElement('li');
+    const a = document.createElement('div'); a.className = 'q'; a.textContent = q;
+    const x = document.createElement('div'); x.className = 'x';
+    const bb = document.createElement('b'); bb.textContent = b; x.appendChild(bb);
+    if (s) { const sp = document.createElement('span'); sp.textContent = s; x.appendChild(sp); }
+    el.append(a, x); return el;
+  }));
+  [...$('nut-chips').children].forEach((c) => c.classList.toggle('on', c.dataset.t === k));
+}
+
+function barra(rotulo, v, alvo, un) {
+  const el = document.createElement('div'); el.className = 'bar';
+  const l = document.createElement('div'); l.className = 'bl';
+  const a = document.createElement('span'); a.textContent = rotulo;
+  const b = document.createElement('b'); b.textContent = Math.round(v).toLocaleString('pt-BR') + ' / ' + Math.round(alvo).toLocaleString('pt-BR') + ' ' + un;
+  l.append(a, b);
+  const tr = document.createElement('div'); tr.className = 'bt';
+  const f = document.createElement('div'); const r = alvo ? v / alvo : 0;
+  f.className = 'bf' + (r < 0.85 ? ' baixo' : r > 1.15 ? ' alto' : '');
+  f.style.width = Math.min(100, Math.round(r * 100)) + '%';
+  tr.appendChild(f); el.append(l, tr); return el;
+}
+
+function renderNutAnalise(lista) {
+  if (!lista.length) return;
+  const n = lista[0];
+  $('nan-vazio').classList.add('hidden'); $('nan-box').classList.remove('hidden');
+  $('nan-t').textContent = n.title; $('nan-d').textContent = fmt(n.ts);
+  const base = NUTRI[n.tipo] || NUTRI.descanso;
+  const alvo = Object.assign({ kcal: base.kcal, carb: base.c, prot: base.p, gord: base.g }, n.alvo || {});
+  const tot = n.total || {};
+  const bars = [];
+  if (tot.kcal != null) bars.push(barra('Calorias', tot.kcal, alvo.kcal, 'kcal'));
+  if (tot.carb != null) bars.push(barra('Carbo', tot.carb, alvo.carb, 'g'));
+  if (tot.prot != null) bars.push(barra('Proteína', tot.prot, alvo.prot, 'g'));
+  if (tot.gord != null) bars.push(barra('Gordura', tot.gord, alvo.gord, 'g'));
+  $('nan-bars').replaceChildren(...bars);
+  const refs = Array.isArray(n.refeicoes) ? n.refeicoes : [];
+  $('nan-ref').replaceChildren(...refs.map(([q, b, s]) => {
+    const el = document.createElement('li');
+    const a = document.createElement('div'); a.className = 'q'; a.textContent = q;
+    const x = document.createElement('div'); x.className = 'x';
+    const bb = document.createElement('b'); bb.textContent = b; x.appendChild(bb);
+    if (s) { const sp = document.createElement('span'); sp.textContent = s; x.appendChild(sp); }
+    el.append(a, x); return el;
+  }));
+  $('nan-x').textContent = n.texto || n.body || '';
+  if (lista.length > 1) {
+    $('nan-old-d').classList.remove('hidden');
+    $('nan-old').replaceChildren(...lista.slice(1, 30).map((o) => itemMsg(o, 'old')));
+  }
+}
+
 // ---------- utilidades ----------
 function contagem() {
   const d = Math.ceil((PROVA - new Date()) / 86400000);
@@ -388,7 +647,7 @@ function itemMsg(m, cls) {
   return el;
 }
 
-const ultimo = { hoje: '', analises: '', corpo: '' };
+const ultimo = { hoje: '', analises: '', corpo: '', nutri: '' };
 let abaAtual = 'hoje';
 
 async function render() {
@@ -396,9 +655,11 @@ async function render() {
   const ehAnalise = (m) => m.kind === 'analise' || m.kind === 'resumo';
   const ehCorpo = (m) => m.kind === 'corpo';
   const ehSemana = (m) => m.kind === 'semana';
+  const ehNutri = (m) => m.kind === 'nutricao';
+  const nutris = todas.filter(ehNutri);
   const ans = todas.filter(ehAnalise);
   const corpo = todas.filter(ehCorpo);
-  const ms = todas.filter((m) => !ehAnalise(m) && !ehCorpo(m) && !ehSemana(m));
+  const ms = todas.filter((m) => !ehAnalise(m) && !ehCorpo(m) && !ehSemana(m) && !ehNutri(m));
 
   // Hoje
   const hoje = new Date().toLocaleDateString('pt-BR');
@@ -494,19 +755,29 @@ async function render() {
     }
     $('les-d').textContent = 'Atualizado ' + fmt(c.ts);
   }
+  // Nutrição
+  nutAuto = null; nutFutevolei = false;
+  if (comSemana) {
+    const hojeISO2 = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const dHoje = comSemana.semana.find((d) => d.d === hojeISO2);
+    if (dHoje) { nutAuto = tipoNutri(dHoje.itens); nutFutevolei = (dHoje.itens || []).some((i) => i.t === 'futevolei'); }
+  }
+  renderNutri();
+  renderNutAnalise(nutris);
+
   if (!tipoSel) tipoSel = comTreino ? tipoDoTreino(comTreino.treino.nome) : 'leve';
   $('rot-sub').textContent = comTreino ? 'Sugerido para: ' + comTreino.treino.nome + '. Toque para trocar.' : 'Escolha o treino:';
   renderRotina();
 
   // pontos de novidade
-  ultimo.hoje = ms[0] ? ms[0].ts : ''; ultimo.analises = ans[0] ? ans[0].ts : ''; ultimo.corpo = corpo[0] ? corpo[0].ts : '';
+  ultimo.hoje = ms[0] ? ms[0].ts : ''; ultimo.analises = ans[0] ? ans[0].ts : ''; ultimo.corpo = corpo[0] ? corpo[0].ts : ''; ultimo.nutri = nutris[0] ? nutris[0].ts : '';
   marcarLido(abaAtual, ultimo[abaAtual]);
-  ['hoje', 'analises', 'corpo'].forEach((k) => $('dot-' + k).classList.toggle('hidden', !ultimo[k] || ultimo[k] <= lido(k) || k === abaAtual));
+  ['hoje', 'analises', 'corpo', 'nutri'].forEach((k) => $('dot-' + k).classList.toggle('hidden', !ultimo[k] || ultimo[k] <= lido(k) || k === abaAtual));
 }
 
 function abrirAba(tab) {
   abaAtual = tab;
-  ['hoje', 'analises', 'corpo'].forEach((k) => $('tab-' + k).classList.toggle('hidden', k !== tab));
+  ['hoje', 'analises', 'corpo', 'nutri'].forEach((k) => $('tab-' + k).classList.toggle('hidden', k !== tab));
   document.querySelectorAll('nav.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
   marcarLido(tab, ultimo[tab]);
   $('dot-' + tab).classList.add('hidden');
@@ -558,6 +829,8 @@ navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', (
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { contagem(); render(); } });
 
 montarChips();
+montarNutChips();
+renderNutri();
 contagem();
 try { const a = localStorage.getItem('aba'); if (a && $('tab-' + a)) abrirAba(a); } catch (_) {}
 swReg().then(() => estado()).catch(() => {});
