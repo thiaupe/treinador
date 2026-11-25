@@ -135,6 +135,14 @@
   .troca .pq { color: var(--muted); font-size: 13px; margin-top: 2px; }
   ul.dicas { margin: 0; padding-left: 18px; } ul.dicas li { margin: 6px 0; }
   nav.tabs button { font-size: 11px; }
+  .chat { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .chat:first-child { border-top: 0; padding-top: 2px; }
+  .bub { max-width: 88%; padding: 8px 12px; border-radius: 16px; white-space: pre-line; font-size: 15px; }
+  .bub.eu { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .bub.tr { align-self: flex-start; background: #23262b; border-bottom-left-radius: 4px; }
+  .chat .d { color: var(--muted); font-size: 12px; align-self: center; }
+  a.btn { display: block; text-align: center; text-decoration: none; margin-top: 12px; border-radius: 12px; padding: 14px 16px;
+    font-weight: 600; background: var(--accent); color: #fff; }
   footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 8px; }
 </style>
 </head>
@@ -259,6 +267,12 @@
 
   <!-- ABA NUTRIÇÃO -->
   <div id="tab-nutri" class="hidden">
+    <section class="card" id="c-chat">
+      <h2>Conversa com o treinador</h2>
+      <div id="chat-lista"><div class="empty">Mande foto ou texto da refeição. As últimas 4 conversas aparecem aqui.</div></div>
+      <a class="btn" id="chat-ir" href="https://claude.ai/code/project/chan_01Xh43Lhfn79cdw2TRnXs4tN?thread=cmsg_01Xh43Lhfn79cdw2TRnXs4tNPtewQB8RZZHLeQ8yRdF1gZ" target="_blank" rel="noopener">📷 Mandar foto ou mensagem</a>
+      <div class="nota">Abre a conversa de nutrição no app do Claude. A resposta chega como notificação e aparece aqui.</div>
+    </section>
     <section class="card">
       <h2 id="nut-h">Alvo de hoje</h2>
       <div class="chips" id="nut-chips"></div>
@@ -278,7 +292,7 @@
 
     <section class="card" id="c-nut-an">
       <h2 id="nan-h">Análise da alimentação</h2>
-      <div id="nan-vazio" class="empty">Ainda sem análise. Mande as fotos das refeições na conversa de nutrição com o treinador; o balanço do dia aparece aqui.</div>
+      <div id="nan-vazio" class="empty">Ainda sem análise. Quando você fechar o dia, o balanço aparece aqui.</div>
       <div id="nan-box" class="hidden">
         <div class="an-t" id="nan-t"></div>
         <div class="an-d" id="nan-d"></div>
@@ -291,25 +305,10 @@
     </section>
 
     <section class="card">
-      <h2>Jantar e lanches · trocas</h2>
-      <div class="sub">O jantar é a maior alavanca. Não é proibir: 2 jantares livres por semana (sábado pós-longão + 1 à escolha, nunca quarta nem sexta, que são véspera de qualidade e de longão).</div>
-      <div id="nut-trocas"></div>
-    </section>
-
-    <section class="card">
       <h2>Treino, água e peso</h2>
       <ul class="dicas" id="nut-dicas"></ul>
     </section>
 
-    <section class="card">
-      <h2>Como registrar</h2>
-      <ul class="dicas">
-        <li>Tire foto de cada refeição, de cima, antes de comer. Mande na conversa de nutrição com o treinador (pode juntar várias de uma vez).</li>
-        <li>Junto, escreva a hora e o que a foto não mostra: bebida, repetiu, quanto comeu da pizza, molho, sobremesa.</li>
-        <li>No fim do dia, mande o jantar ou "fechei o dia": o balanço completo aparece aqui em "Análise da alimentação".</li>
-        <li>Lanche sem foto? Texto basta: "16h, café com 1 fatia de bolo".</li>
-      </ul>
-    </section>
   </div>
 
   <footer>Sem treino perdido.</footer>
@@ -509,14 +508,6 @@ const NUTRI = {
     ],
   },
 };
-const TROCAS = [
-  ['Pizza (4–5 fatias + refri ≈ 1.500 kcal)', '2 fatias + salada grande antes + refri zero', 'Sabores com proteína (frango, atum, marguerita), massa fina, sem borda recheada. Ou pizza caseira em pão sírio/rap10 com frango e queijo.'],
-  ['Hambúrguer + batata frita + refri (≈ 1.600 kcal)', 'Hambúrguer caseiro: pão normal, blend 150 g, queijo, salada', 'Batata assada ou na air fryer, refri zero. Na rua: 1 hambúrguer simples sem a batata grande.'],
-  ['Pão à noite com frios', 'Omelete de 3 ovos + 1 pão + queijo branco + tomate', 'Mesmo ritual, com proteína de verdade e metade das calorias.'],
-  ['Pedido de delivery', 'Poke, comida árabe (kafta/frango + coalhada + salada), frango grelhado, sushi sem cream cheese', 'Escolha que mata a vontade de "pedir comida" sem virar 1.500 kcal.'],
-  ['Pão ou bolo às 10h e às 16h', 'Iogurte grego + fruta, pão com ovo, tapioca com ovo, whey com leite', 'Os dois lanches viram 25–40 g de proteína. Bolo fica para dia de qualidade ou longão.'],
-  ['Cerveja/drink', 'No máximo no jantar livre, nunca na véspera de qualidade ou longão', 'Álcool piora o sono e a recuperação, e soma calorias fácil.'],
-];
 const DICAS = [
   'Água: ~3 L por dia de base. Urina amarelo-clara é o alvo.',
   'Treino acima de 60 min no calor do Rio: 400–800 ml por hora, com sódio (isotônico ou cápsula de sal) nos longões acima de 90 min.',
@@ -549,13 +540,6 @@ function montarNutChips() {
     const b = document.createElement('button'); b.className = 'chip'; b.dataset.t = k; b.textContent = v.nome;
     b.onclick = () => { nutSel = k; renderNutri(); };
     return b;
-  }));
-  $('nut-trocas').replaceChildren(...TROCAS.map(([de, pa, pq]) => {
-    const el = document.createElement('div'); el.className = 'troca';
-    const a = document.createElement('div'); a.className = 'de'; a.textContent = de;
-    const b = document.createElement('div'); b.className = 'pa'; b.textContent = '→ ' + pa;
-    const c = document.createElement('div'); c.className = 'pq'; c.textContent = pq;
-    el.append(a, b, c); return el;
   }));
   $('nut-dicas').replaceChildren(...DICAS.map((d) => { const li = document.createElement('li'); li.textContent = d; return li; }));
 }
@@ -593,6 +577,18 @@ function barra(rotulo, v, alvo, un) {
   f.className = 'bf' + (r < 0.85 ? ' baixo' : r > 1.15 ? ' alto' : '');
   f.style.width = Math.min(100, Math.round(r * 100)) + '%';
   tr.appendChild(f); el.append(l, tr); return el;
+}
+
+
+function renderChat(lista) {
+  if (!lista.length) return;
+  $('chat-lista').replaceChildren(...lista.slice(0, 4).reverse().map((m) => {
+    const el = document.createElement('div'); el.className = 'chat';
+    const d = document.createElement('div'); d.className = 'd'; d.textContent = fmt(m.ts); el.appendChild(d);
+    if (m.voce) { const b = document.createElement('div'); b.className = 'bub eu'; b.textContent = m.voce; el.appendChild(b); }
+    const r = document.createElement('div'); r.className = 'bub tr'; r.textContent = m.treinador || m.texto || m.body; el.appendChild(r);
+    return el;
+  }));
 }
 
 function renderNutAnalise(lista) {
@@ -747,10 +743,11 @@ async function render() {
   const ehCorpo = (m) => m.kind === 'corpo';
   const ehSemana = (m) => m.kind === 'semana' || m.kind === 'peso';
   const ehNutri = (m) => m.kind === 'nutricao';
+  const chats = todas.filter((m) => m.kind === 'nutrichat');
   const nutris = todas.filter(ehNutri);
   const ans = todas.filter(ehAnalise);
   const corpo = todas.filter(ehCorpo);
-  const ms = todas.filter((m) => !ehAnalise(m) && !ehCorpo(m) && !ehSemana(m) && !ehNutri(m));
+  const ms = todas.filter((m) => !ehAnalise(m) && !ehCorpo(m) && !ehSemana(m) && !ehNutri(m) && m.kind !== 'nutrichat');
 
   // Hoje
   const hoje = new Date().toLocaleDateString('pt-BR');
@@ -858,13 +855,14 @@ async function render() {
   }
   renderNutri();
   renderNutAnalise(nutris);
+  renderChat(chats);
 
   if (!tipoSel) tipoSel = comTreino ? tipoDoTreino(comTreino.treino.nome) : 'leve';
   $('rot-sub').textContent = comTreino ? 'Sugerido para: ' + comTreino.treino.nome + '. Toque para trocar.' : 'Escolha o treino:';
   renderRotina();
 
   // pontos de novidade
-  ultimo.hoje = ms[0] ? ms[0].ts : ''; ultimo.analises = ans[0] ? ans[0].ts : ''; ultimo.corpo = corpo[0] ? corpo[0].ts : ''; ultimo.nutri = nutris[0] ? nutris[0].ts : '';
+  ultimo.hoje = ms[0] ? ms[0].ts : ''; ultimo.analises = ans[0] ? ans[0].ts : ''; ultimo.corpo = corpo[0] ? corpo[0].ts : ''; ultimo.nutri = [nutris[0], chats[0]].filter(Boolean).map((m) => m.ts).sort().pop() || '';
   marcarLido(abaAtual, ultimo[abaAtual]);
   ['hoje', 'analises', 'corpo', 'nutri'].forEach((k) => $('dot-' + k).classList.toggle('hidden', !ultimo[k] || ultimo[k] <= lido(k) || k === abaAtual));
 }
